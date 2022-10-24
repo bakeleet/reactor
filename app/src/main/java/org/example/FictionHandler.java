@@ -1,25 +1,36 @@
 package org.example;
 
-import org.example.model.fiction.FictionFantasy;
-import org.example.model.fiction.FictionHistorical;
+import org.example.model.fiction.Fantasy;
+import org.example.model.fiction.Historical;
 import org.example.model.fiction.FictionRecord;
-import org.example.model.fiction.FictionScienceFiction;
+import org.example.model.fiction.ScienceFiction;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Random;
+import java.time.Duration;
+import java.util.*;
 
 public class FictionHandler {
 
+    private final List<FictionRecord> fictions = new ArrayList<>(
+        Arrays.asList(
+            new ScienceFiction("Large Magellanic Cloud"),
+            new Fantasy("Geralt"),
+            new Historical("Ukraine")
+        )
+    );
+
     public Mono<FictionRecord> getRandomFiction() {
-        var fictions = List.of(
-                new FictionScienceFiction("Large Magellanic Cloud"),
-                new FictionFantasy("Geralt"),
-                new FictionHistorical("Ukraine")
-        );
-        var rand = new Random();
-        var randomFiction = fictions.get(rand.nextInt(fictions.size()));
-        return Mono.just(randomFiction);
+        var randomNumber = new Random().nextInt(fictions.size());
+        var randomFiction = fictions.get(randomNumber);
+        return Mono.just(randomFiction)
+                .delayElement(Duration.ofMillis(250));
+    }
+
+    public Flux<FictionRecord> getAllFictionInRandomOrder() {
+//        Collections.shuffle(fictions);
+        return Flux.fromIterable(fictions)
+                .delayElements(Duration.ofMillis(1000));
     }
 
     public void printScienceFiction() {

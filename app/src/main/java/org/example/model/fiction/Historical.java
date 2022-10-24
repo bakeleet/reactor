@@ -1,10 +1,10 @@
 package org.example.model.fiction;
 
-public class FictionHistorical extends FictionRecord {
+public class Historical extends FictionRecord {
 
     private String countryName;
 
-    public FictionHistorical(String countryName) {
+    public Historical(String countryName) {
         super(FictionType.HISTORICAL);
         this.countryName = countryName;
     }
