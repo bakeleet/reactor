@@ -1,9 +1,5 @@
 package org.example;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 import org.example.model.fiction.FictionRecord;
 import org.example.model.interim.Action;
 import org.example.model.interim.Break;
@@ -14,79 +10,71 @@ import reactor.core.publisher.Mono;
 
 public class Controller {
 
-    private FictionHandler handler = new FictionHandler();
-    private FictionContext context = new FictionContext(handler);
+    private FictionHandler fictionHandler = new FictionHandler();
+    private NonfictionHandler nonfictionHandler = new NonfictionHandler();
+    private LiteraryContext context = new LiteraryContext(fictionHandler, nonfictionHandler);
 
-    @AllArgsConstructor
-    @Getter
-    @Setter
-    @ToString
-    public static class FibonacciState {
-        private int former;
-        private int latter;
-    }
-
-    public Flux<Integer> getFibonacci(int limit) {
-        return Flux.generate(
-                () -> new FibonacciState(0, 1),
-                (state, sink) -> {
-                    System.out.println("Generating number: " + state);
-                    sink.next(state.getFormer());
-                    if (state.getLatter() > limit) {
-                        sink.complete();
-                    }
-                    int temp = state.getFormer();
-                    state.setFormer(state.getLatter());
-                    state.setLatter(temp + state.getLatter());
-                    return state;
-                });
-    }
-
-    public Flux<InterimState> getAllFiction() {
-//        return handler.getRandomFiction().map(record -> {
-//            var state = switch (record.getType()) {
-//                case SCIENCE_FICTION -> new Transient(record.getType().name());
-//                case FANTASY -> new Action(context.requestRandom());
-////                    case FANTASY -> new Action(
-////                        Mono.fromCallable(() -> {
-////                            return context.requestRandom();
-////                            return null;
-////                        })
-////                    );
-//                case HISTORICAL -> new Break();
-////            };
-//            context.setCurrentState(state);
-//        });
-            return Flux.generate(
-                () -> context.getCurrentState(),
-                (state, sink) -> {
-                    System.out.println("Current context metadata: " + context.getMetadata());
-                    sink.next(state);
-                    if (state instanceof Break) {
-                        sink.complete();
-                    }
-                    context.setCurrentState(state);
-                    return state;
-                });
+    public Mono<String> getSomeFiction() {
+        return fictionHandler
+                .getRandomFiction()
+                .map(this::mapRecord);
+//            return Flux.generate(
+//                () -> context.getCurrentState(),
+//                (state, sink) -> {
+//                    System.out.println("Current context metadata: " + context.getMetadata());
+//                    sink.next(state);
+//                    if (state instanceof Break) {
+//                        sink.complete();
+//                    }
+//                    context.setCurrentState(state);
+//                    return state;
+//                });
 //        var list = handler.getAllFictionInRandomOrder();
 //        return list
 //                .map(record -> switch (record.getType()) {
 //                    case SCIENCE_FICTION -> new Transient(record.getType().name());
 //                    case FANTASY -> new Action(context.requestRandom());
-////                    case FANTASY -> new Action(
-////                        Mono.fromCallable(() -> {
-////                            return context.requestRandom();
-//////                            return null;
-////                        })
-////                    );
 //                    case HISTORICAL -> new Break();
 //                })
 //                .takeUntil(state -> state instanceof Break)
 //                .map(InterimState::handle);
     }
 
+    public Mono<String> getFantasy() {
+        return fictionHandler
+                .getFantasy()
+                .map(this::mapRecord);
+    }
+
+    public Mono<String> getScienceFiction() {
+        return fictionHandler
+                .getScienceFiction()
+                .map(this::mapRecord);
+    }
+
+    public Mono<String> getHistorical() {
+        return fictionHandler
+                .getHistorical()
+                .map(this::mapRecord);
+    }
+
+    private String mapRecord(FictionRecord record) {
+        context.setCurrentRecord(record);
+        System.out.println("CONTROLLER: record type = " + record.getType());
+
+        var state = switch (record.getType()) {
+            case SCIENCE_FICTION -> new Transient(record.getType().name());
+            case FANTASY -> new Action(context.requestRandom());
+            case HISTORICAL -> new Break();
+        };
+        System.out.println("CONTROLLER: state type = " + state.getType());
+        context.setCurrentState(state);
+
+        return context.getMetadata();
+    }
+
 //    public Mono<String> getSingleRecord() {
-//        return handler.getRandomFiction()
+//        return fictionHandler.getRandomFiction()
 //                .map(record -> {
 //                    switch (record.getType()) {
 //                        case FANTASY -> context.dispatchFantasy();

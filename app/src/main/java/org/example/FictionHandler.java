@@ -12,37 +12,40 @@ import java.util.*;
 
 public class FictionHandler {
 
+    private FictionRecord sciFi = new ScienceFiction("Large Magellanic Cloud");
+    private FictionRecord fantasy = new Fantasy("Geralt");
+    private FictionRecord history = new Historical("Ukraine");
+
     private final List<FictionRecord> fictions = new ArrayList<>(
-        Arrays.asList(
-            new ScienceFiction("Large Magellanic Cloud"),
-            new Fantasy("Geralt"),
-            new Historical("Ukraine")
-        )
+        Arrays.asList(sciFi, fantasy, history)
     );
 
     public Mono<FictionRecord> getRandomFiction() {
-        var randomNumber = new Random().nextInt(fictions.size());
-        var randomFiction = fictions.get(randomNumber);
+        var rand = new Random();
+        var randomFiction = fictions.get(rand.nextInt(fictions.size()));
         return Mono.just(randomFiction)
-                .delayElement(Duration.ofMillis(250));
+                .delayElement(Duration.ofMillis(rand.nextInt(500)));
     }
 
     public Flux<FictionRecord> getAllFictionInRandomOrder() {
-//        Collections.shuffle(fictions);
+        Collections.shuffle(fictions);
         return Flux.fromIterable(fictions)
-                .delayElements(Duration.ofMillis(1000));
+                .delayElements(Duration.ofMillis(250));
     }
 
-    public void printScienceFiction() {
-        System.out.println("dispatched task: science fiction");
+    public Mono<FictionRecord> getScienceFiction() {
+        return Mono.just(sciFi)
+                .delayElement(Duration.ofMillis(new Random().nextInt(500)));
     }
 
-    public void printFantasy() {
-        System.out.println("dispatched task: fantasy");
+    public Mono<FictionRecord> getFantasy() {
+        return Mono.just(fantasy)
+                .delayElement(Duration.ofMillis(new Random().nextInt(500)));
     }
 
-    public void printHistorical() {
-        System.out.println("dispatched task: science fiction");
+    public Mono<FictionRecord> getHistorical() {
+        return Mono.just(history)
+                .delayElement(Duration.ofMillis(new Random().nextInt(500)));
     }
 
 }

@@ -7,17 +7,30 @@ public class Main {
 
 //        controller
 //            .getSingleRecord()
-//            .subscribe(value -> System.out.println("SINGLE: " + value));
-
-        controller
-            .getAllFiction()
-            .subscribe(value -> System.out.println("MULTIPLE: " + value));
+//            .subscribe(value -> System.out.println("MAIN(single): " + value));
 
 //        controller
-//            .getFibonacci(100)
-//            .subscribe(value -> System.out.println("FIBONACCI: " + value));
+//            .getSomeFiction()
+//            .subscribe(value -> System.out.println("MAIN(random): metadata = " + value));
 
-        Thread.sleep(5000);
+
+        controller
+            .getScienceFiction()
+            .subscribe(value -> System.out.println("MAIN(sci-fi): metadata = " + value));
+
+        Thread.sleep(1000);
+
+        controller
+            .getFantasy()
+            .subscribe(value -> System.out.println("MAIN(fantasy): metadata = " + value));
+
+        Thread.sleep(1000);
+
+        controller
+            .getHistorical()
+            .subscribe(value -> System.out.println("MAIN(history): metadata = " + value));
+
+        Thread.sleep(1000);
     }
 
 }

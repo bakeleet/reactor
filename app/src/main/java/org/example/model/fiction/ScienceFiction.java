@@ -1,5 +1,10 @@
 package org.example.model.fiction;
 
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@ToString
 public class ScienceFiction extends FictionRecord {
 
     private String galaxyName;
